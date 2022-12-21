@@ -22,8 +22,9 @@ router.post('/register', async (req, res) => {
     const user = req.body
     // encrypt password
     const cipher = crypto.createCipher(algorithm, key);
-    const encrypted = cipher.update(user.password, 'utf8', 'hex') + cipher.final('hex');
-
+    // the syntax for encryption is accepting the password from the user and then adding the code for encryption and then the hex code  and including the hex
+    const encrypted = cipher.update(req.body.password, 'utf8', 'hex') + cipher.final('hex');
+     console.log(encrypted)
     const newUser = new User({
         username: user.username,
         email: user.email,
@@ -37,7 +38,6 @@ router.post('/register', async (req, res) => {
         console.log('user has been created', savedUser)
     } catch (e) {
         res.status(500).json(e)
-        console.log(e)
     }
 
 });
@@ -45,18 +45,20 @@ router.post('/register', async (req, res) => {
 // // LOGIN
 
 router.post('/login', async (req, res) => {
-    console.log('entering in the login section')
     const user = req.body
 
 
     try {
         const savedUser = await User.findOne({ username: user.username });
+        !savedUser && res.status(401).send('User not found in database')
         const decipher = crypto.createDecipher(algorithm, key);
         const decrypted = decipher.update(savedUser.password, 'hex', 'utf8') + decipher.final('utf8');
-
-
+   
         if(decrypted === user.password)return res.status(200).json(savedUser)
-        return res.status(404).send('User not found');
+        else{
+
+            return res.status(404).send('Password is incorrect');
+        }
     } catch (err) {
         res.status(500).json(err)
     }
@@ -64,4 +66,3 @@ router.post('/login', async (req, res) => {
 
 
 module.exports = router;
-

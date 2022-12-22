@@ -2,17 +2,11 @@
 // always  remember logged in using mshahilk28@gmail.com in mongodb
 const router = require('express').Router();
 const User = require('../models/User')
-
 const crypto = require('crypto')
-
 const algorithm = 'aes256'; // or any other algorithm supported by OpenSSL
 const key = 'password';
-
-
-
-
+const jwt=require('jsonwebtoken')
 // register user
-
 
 // const CryptoJs=require('crypto-js')
 
@@ -45,24 +39,26 @@ router.post('/register', async (req, res) => {
 // // LOGIN
 
 router.post('/login', async (req, res) => {
-    const user = req.body
-
-
     try {
-        const savedUser = await User.findOne({ username: user.username });
+        const savedUser = await User.findOne({ username: req.body.username });
         !savedUser && res.status(401).send('User not found in database')
         const decipher = crypto.createDecipher(algorithm, key);
         const decrypted = decipher.update(savedUser.password, 'hex', 'utf8') + decipher.final('utf8');
    
-        if(decrypted === user.password)return res.status(200).json(savedUser)
-        else{
-
-            return res.status(404).send('Password is incorrect');
-        }
-    } catch (err) {
-        res.status(500).json(err)
+        const {password,...others}=savedUser._doc
+        if(decrypted !== req.body.password)return res.status(401).json('Wrong credentials')
+            const accessToken=jwt.sign({
+           id:savedUser.id,
+           isAdmin:savedUser.isAdmin
+            },
+            process.env.JWT_SEC,
+            {expiresIn:'3d'}
+            );
+            // console.log(accessToken)
+        res.status(200).json({...others,accessToken})
+    }catch(err) {
+       res.status(500).json(err)
     }
 })
-
 
 module.exports = router;

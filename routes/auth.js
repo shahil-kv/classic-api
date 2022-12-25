@@ -18,7 +18,6 @@ router.post('/register', async (req, res) => {
     const cipher = crypto.createCipher(algorithm, key);
     // the syntax for encryption is accepting the password from the user and then adding the code for encryption and then the hex code  and including the hex
     const encrypted = cipher.update(req.body.password, 'utf8', 'hex') + cipher.final('hex');
-     console.log(encrypted)
     const newUser = new User({
         username: user.username,
         email: user.email,
@@ -29,7 +28,7 @@ router.post('/register', async (req, res) => {
         const savedUser = await newUser.save()
         const { id, username, password } = savedUser
         res.status(201).json(id)
-        console.log('user has been created', savedUser)
+     console.log('user has been created')
     } catch (e) {
         res.status(500).json(e)
     }
@@ -54,7 +53,6 @@ router.post('/login', async (req, res) => {
             process.env.JWT_SEC,
             {expiresIn:'3d'}
             );
-            // console.log(accessToken)
         res.status(200).json({...others,accessToken})
     }catch(err) {
        res.status(500).json(err)

@@ -4,12 +4,17 @@ const verifyToken=(req,res,next)=>{
     const authHeader=req.headers.token
     if(authHeader){
         const token=authHeader.split(" ")[1]
-        console.log(token)
-       jwt.verify(token,process.env.JWT_SEC,(err,user)=>{
+        const secretKey=process.env.JWT_SEC
+        // we split out the 2 parameters from the token into one
+        // next step is we are going to check the token is working or not
+       jwt.verify(token,secretKey,(err,user)=>{
         if(err) res.status(403).json('Token is not valid')
+        // we get the user from using the secret key and the token they provide if that is an error then we will catch it and show to the user
+        // console.log(user)
          req.user=user
          next();
        })
+    //    if the users token is not true then this is will happen example if the token is wrong
     }else{
         return res.status(401).json('You are not authenticated or if the token and the id is not provided')
     }

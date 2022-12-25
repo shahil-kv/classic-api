@@ -16,6 +16,7 @@ mongoose
 //   what we are doing here is seting the api/user and the userRoute for showing 
 // we can use the other routes using the api/user/and then if we put any of the links it will go to userRoute and if there is a link then it will be collected
   app.use(express.json())
+  // This is the user Router we need to done
   app.use('/api/users',userRoute);
   app.use('/api/auth',authRoute );
   app.listen(5000, () => {

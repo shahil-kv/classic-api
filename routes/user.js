@@ -3,6 +3,7 @@ const { verifyToken, verifyTokenAndAuthorization } = require('./verifyToken');
 const router=require('express').Router();
 
  router.put("/:id",verifyTokenAndAuthorization, async (req,res)=>{
+   
       if(req.body.password){
         const cipher = crypto.createCipher(algorithm, key);
         const encrypted = cipher.update(req.body.password, 'utf8', 'hex') + cipher.final('hex');
